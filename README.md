@@ -1,6 +1,6 @@
 # Rodent Control Customer App
 
-Ứng dụng dành cho công ty khách hàng. Mỗi công ty có một tài khoản quản lý; đăng nhập bắt buộc qua mật khẩu + OTP email.
+Ứng dụng dành cho công ty khách hàng. Mỗi công ty có một tài khoản quản lý; đăng nhập bằng tài khoản + mật khẩu; quên mật khẩu dùng mã 6 số gửi tới email đã đăng ký.
 
 ## Cấu hình API
 Sửa `app/build.gradle`:
