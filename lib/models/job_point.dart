@@ -7,6 +7,7 @@ class JobPoint {
   final String? trapType;
   final int zoneId;
   final String zoneName;
+  final String? qrCode; // Mã QR dán trên hộp bẫy — dùng để kiểm soát nhân viên đúng vị trí.
   final PointResult? result;
 
   JobPoint({
@@ -16,6 +17,7 @@ class JobPoint {
     this.trapType,
     required this.zoneId,
     required this.zoneName,
+    this.qrCode,
     this.result,
   });
 
@@ -26,6 +28,7 @@ class JobPoint {
         trapType: j['trap_type']?.toString(),
         zoneId: j['zone_id'] is int ? j['zone_id'] as int : int.parse(j['zone_id'].toString()),
         zoneName: j['zone_name']?.toString() ?? '',
+        qrCode: j['qr_code']?.toString(),
         result: j['result'] == null ? null : PointResult.fromJson(j['result'] as Map<String, dynamic>),
       );
 }

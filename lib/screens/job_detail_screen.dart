@@ -7,6 +7,7 @@ import '../models/job_point.dart';
 import '../services/job_service.dart';
 import '../widgets/status_badge.dart';
 import 'checkpoint_screen.dart';
+import 'qr_scan_screen.dart';
 
 class JobDetailScreen extends StatefulWidget {
   final int jobId;
@@ -109,6 +110,32 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     }
   }
 
+  Future<void> _scanQr() async {
+    final code = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) => const QrScanScreen(
+          title: 'Quét QR hộp bẫy',
+          hint: 'Quét mã QR dán trên hộp bẫy để mở đúng điểm kiểm soát.',
+        ),
+      ),
+    );
+    if (code == null || code.isEmpty || !mounted) return;
+
+    setState(() => _busy = true);
+    try {
+      final point = await _jobService.lookupByQr(widget.jobId, code);
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => CheckpointScreen(jobId: widget.jobId, point: point)),
+      );
+      _load();
+    } catch (e) {
+      _snack(e is ApiException ? e.message : 'Không tra được điểm kiểm soát cho mã QR này.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _complete() async {
     final points = _detail?.points ?? [];
     final unrecorded = points.where((p) => p.result == null).length;
@@ -201,7 +228,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           const Divider(height: 32),
           _buildStepper(job),
           const Divider(height: 32),
-          Text('Điểm kiểm soát (${d.points.length})', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Điểm kiểm soát (${d.points.length})', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              OutlinedButton.icon(
+                onPressed: _busy ? null : _scanQr,
+                icon: const Icon(Icons.qr_code_scanner),
+                label: const Text('Quét QR'),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
           ...d.points.map(_buildPointTile),
           const SizedBox(height: 24),
@@ -236,10 +273,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   Widget _buildPointTile(JobPoint p) {
     final hasResult = p.result != null;
+    final hasQr = (p.qrCode ?? '').isNotEmpty;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        title: Text('${p.pointNumber}. ${p.name}'),
+        title: Row(
+          children: [
+            Expanded(child: Text('${p.pointNumber}. ${p.name}')),
+            if (hasQr) const Padding(
+              padding: EdgeInsets.only(left: 6),
+              child: Icon(Icons.qr_code_2, size: 18, color: Colors.grey),
+            ),
+          ],
+        ),
         subtitle: Text('${p.zoneName}${p.trapType != null ? ' · ${p.trapType}' : ''}'),
         trailing: hasResult
             ? StatusBadge(code: p.result!.result, label: PointResult.labels[p.result!.result] ?? p.result!.result, isJobStatus: false)

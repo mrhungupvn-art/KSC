@@ -37,6 +37,9 @@ dependencies:
   # Sinh id duy nhất cho hàng đợi đồng bộ offline
   uuid: ^4.4.0
 
+  # Quét mã QR dán trên hộp bẫy để kiểm soát nhân viên đúng vị trí hiện trường
+  mobile_scanner: ^5.2.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

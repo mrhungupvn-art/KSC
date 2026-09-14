@@ -76,13 +76,26 @@ class JobService {
     String result, {
     String? actionTaken,
     String? notes,
+    String? qrCode,
   }) =>
       _doAction(jobId, 'record_point', {
         'control_point_id': controlPointId,
         'result': result,
         'action_taken': actionTaken ?? '',
         'notes': notes ?? '',
+        if (qrCode != null && qrCode.isNotEmpty) 'qr_code': qrCode,
       });
+
+  /// Tra cứu điểm kiểm soát theo mã QR vừa quét, giới hạn trong phạm vi
+  /// công việc hiện tại. Ném ApiException nếu mã không thuộc công việc này.
+  Future<JobPoint> lookupByQr(int jobId, String qrCode) async {
+    final data = await ApiClient.instance.postJson('/jobs.php', {
+      'action': 'lookup_qr',
+      'job_id': jobId,
+      'qr_code': qrCode,
+    });
+    return JobPoint.fromJson(data['point'] as Map<String, dynamic>);
+  }
 
   Future<bool> customerConfirm(int jobId) => _doAction(jobId, 'customer_confirm', {});
 

@@ -4,9 +4,19 @@ App di động cho nhân viên KSC/GFC: nhận việc, bắt đầu (ghi GPS), g
 soát, chụp & tải ảnh bằng chứng, khách hàng xác nhận, hoàn thành công việc. Gọi thẳng vào
 `api/` đã có sẵn trên `ksc.foodkcn.com` (không cần sửa gì ở backend).
 
+**Kiểm soát QR trên hộp bẫy:** mỗi hộp bẫy/trạm bả ngoài hiện trường được Web Admin cấp 1
+mã QR riêng (in tem tại `admin/zone-form.php` → mục điểm kiểm soát). Trong app, nhân viên có
+thể quét QR để mở thẳng đúng điểm kiểm soát (nút "Quét QR" ở màn hình chi tiết công việc), và
+với các điểm đã có QR thì **bắt buộc quét đúng mã** trước khi được lưu kết quả lần đầu — nhằm
+đảm bảo nhân viên thực sự có mặt tại đúng vị trí (xem `lib/screens/qr_scan_screen.dart`,
+`lib/screens/checkpoint_screen.dart`). Nếu tem QR bị mờ/hỏng, có thể bấm "Nhập mã tay" và gõ
+đúng mã in bên dưới tem.
+
 **Hoạt động offline:** mọi thao tác ghi (nhận việc/bắt đầu/ghi kết quả/tải ảnh/xác nhận/hoàn
 thành) đều lưu trước vào máy; nếu đang mất mạng, thao tác được xếp vào hàng đợi và **tự động
 gửi lại theo đúng thứ tự** khi điện thoại có mạng trở lại (xem `lib/services/sync_service.dart`).
+Riêng thao tác "Quét QR để mở điểm" (tra cứu theo mã) cần có mạng vì phải xác thực với server;
+việc ghi kết quả sau đó vẫn hoạt động offline như bình thường.
 
 ## Trước khi build: đổi đúng domain của bạn
 
@@ -60,7 +70,7 @@ lib/
 ├── core/            # cấu hình API, quản lý phiên đăng nhập, DB offline
 ├── models/          # Employee, Job, JobPoint
 ├── services/        # AuthService, JobService (gọi API + cache/queue), SyncService
-├── screens/         # LoginScreen, JobListScreen, JobDetailScreen, CheckpointScreen
+├── screens/         # LoginScreen, JobListScreen, JobDetailScreen, CheckpointScreen, QrScanScreen
 └── widgets/         # StatusBadge
 ```
 
