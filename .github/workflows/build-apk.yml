@@ -1,0 +1,69 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Generate Android platform project (only if missing)
+        run: |
+          if [ ! -d "android" ]; then
+            flutter create --platforms=android --org com.ksc.gfc --project-name ksc_app .
+          fi
+
+      - name: Add required Android permissions (Internet/Camera/GPS)
+        run: |
+          python3 - <<'PYEOF'
+          import re
+
+          path = "android/app/src/main/AndroidManifest.xml"
+          with open(path, "r", encoding="utf-8") as f:
+              content = f.read()
+
+          permissions = (
+              '    <uses-permission android:name="android.permission.INTERNET"/>\n'
+              '    <uses-permission android:name="android.permission.CAMERA"/>\n'
+              '    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n'
+              '    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n'
+              '    <uses-feature android:name="android.hardware.camera" android:required="false"/>\n'
+          )
+
+          if "android.permission.INTERNET" not in content:
+              content = re.sub(r"(<manifest[^>]*>)", r"\1\n" + permissions, content, count=1)
+              with open(path, "w", encoding="utf-8") as f:
+                  f.write(content)
+              print("Đã thêm quyền vào AndroidManifest.xml")
+          else:
+              print("AndroidManifest.xml đã có quyền cần thiết, bỏ qua.")
+          PYEOF
+
+      - name: Get Flutter packages
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ksc-app-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
