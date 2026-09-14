@@ -75,7 +75,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       if (permission != LocationPermission.denied && permission != LocationPermission.deniedForever) {
         if (await Geolocator.isLocationServiceEnabled()) {
           final pos = await Geolocator.getCurrentPosition(
-            locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 10)),
+            desiredAccuracy: LocationAccuracy.high,
+            timeLimit: const Duration(seconds: 10),
           );
           lat = pos.latitude;
           lng = pos.longitude;
