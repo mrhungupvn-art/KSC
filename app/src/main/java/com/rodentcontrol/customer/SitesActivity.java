@@ -1,5 +1,0 @@
-package com.rodentcontrol.customer;
-import android.content.Intent;import android.os.Bundle;import android.widget.*;import androidx.appcompat.app.AppCompatActivity;import java.util.concurrent.Executors;
-public class SitesActivity extends AppCompatActivity{
- LinearLayout list;protected void onCreate(Bundle b){super.onCreate(b);setContentView(R.layout.activity_list);((TextView)findViewById(R.id.title)).setText("Địa điểm / Nhà máy");list=findViewById(R.id.list);Executors.newSingleThreadExecutor().execute(()->{try{org.json.JSONArray a=Api.sites(this).getJSONArray("sites");runOnUiThread(()->{for(int i=0;i<a.length();i++)try{org.json.JSONObject s=a.getJSONObject(i);Button x=new Button(this);x.setText(s.optString("code")+" - "+s.optString("name"));x.setOnClickListener(v->{Intent in=new Intent(this,SiteDetailActivity.class);in.putExtra("id",s.optInt("id"));startActivity(in);});list.addView(x);}catch(Exception ignored){}});}catch(Exception e){runOnUiThread(()->Toast.makeText(this,e.getMessage(),Toast.LENGTH_LONG).show());}});}
-}
