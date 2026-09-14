@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/session_manager.dart';
 import 'screens/job_list_screen.dart';
 import 'screens/login_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Bắt buộc phải gọi trước khi dùng DateFormat(..., 'vi') ở JobListScreen,
+  // nếu không sẽ ném LocaleDataException ngay khi build -> app hiện màn
+  // hình trắng ngay sau khi đăng nhập (crash không có UI báo lỗi ở release).
+  await initializeDateFormatting('vi', null);
   runApp(const KscApp());
 }
 
