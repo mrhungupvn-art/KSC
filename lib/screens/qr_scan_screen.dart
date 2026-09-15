@@ -81,7 +81,50 @@ class _QrScanScreenState extends State<QrScanScreen> {
       ),
       body: Stack(
         children: [
-          MobileScanner(controller: _controller, onDetect: _onDetect),
+          MobileScanner(
+            controller: _controller,
+            onDetect: _onDetect,
+            // Mặc định mobile_scanner chỉ hiện 1 icon dấu chấm than khi camera lỗi,
+            // không nói rõ nguyên nhân -> người dùng tưởng máy hỏng. Hiện rõ lý do
+            // + nút thử lại để tự khắc phục được (thường là do chưa cấp quyền Camera).
+            errorBuilder: (context, error, child) {
+              String msg;
+              switch (error.errorCode) {
+                case MobileScannerErrorCode.permissionDenied:
+                  msg = 'Chưa được cấp quyền Camera.\n'
+                      'Vào Cài đặt điện thoại → Ứng dụng → app này → Quyền → bật Camera, '
+                      'rồi quay lại màn hình này.';
+                  break;
+                case MobileScannerErrorCode.unsupported:
+                  msg = 'Thiết bị này không hỗ trợ quét mã QR bằng camera.';
+                  break;
+                default:
+                  msg = 'Không mở được camera (${error.errorCode.name}).\n'
+                      'Hãy tắt các app khác đang dùng camera rồi thử lại.';
+              }
+              return Container(
+                color: Colors.black,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.videocam_off, color: Colors.white, size: 48),
+                    const SizedBox(height: 16),
+                    Text(msg, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+                    const SizedBox(height: 20),
+                    FilledButton(onPressed: () => _controller.start(), child: const Text('Thử lại')),
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      onPressed: _enterManually,
+                      icon: const Icon(Icons.keyboard, color: Colors.white70),
+                      label: const Text('Nhập mã tay thay vì quét', style: TextStyle(color: Colors.white70)),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           // Khung ngắm ở giữa để nhân viên căn mã QR cho dễ.
           Center(
             child: Container(
