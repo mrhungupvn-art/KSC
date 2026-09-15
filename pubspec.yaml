@@ -37,8 +37,11 @@ dependencies:
   # Sinh id duy nhất cho hàng đợi đồng bộ offline
   uuid: ^4.4.0
 
-  # Quét mã QR dán trên hộp bẫy để kiểm soát nhân viên đúng vị trí hiện trường
-  mobile_scanner: ^5.2.3
+  # Quét mã QR dán trên hộp bẫy để kiểm soát nhân viên đúng vị trí hiện trường.
+  # Dùng zxing (Camera1 API) trên Android thay vì CameraX/MLKit vì các máy đời thấp
+  # (ví dụ Oppo A5i, chip MediaTek cũ, camera2 ở mức LEGACY) thường bị lỗi
+  # "genericError" khi mở camera bằng CameraX.
+  qr_code_scanner_plus: ^2.2.0
 
 dev_dependencies:
   flutter_test:
