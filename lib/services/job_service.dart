@@ -90,7 +90,7 @@ class JobService {
   /// công việc hiện tại. Ném ApiException nếu mã không thuộc công việc này.
   Future<JobPoint> lookupByQr(int jobId, String qrCode) async {
     final data = await ApiClient.instance.postJson('/jobs.php', {
-      'action': 'lookup_qr',
+      'action': 'scan_qr',
       'job_id': jobId,
       'qr_code': qrCode,
     });
