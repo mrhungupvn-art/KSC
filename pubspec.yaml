@@ -1,0 +1,52 @@
+name: ksc_app
+description: App nhân viên KSC/GFC - kiểm soát chuột hiện trường.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Gọi API
+  dio: ^5.4.3
+
+  # Lưu token đăng nhập an toàn
+  flutter_secure_storage: ^9.2.2
+
+  # Local DB: cache dữ liệu + hàng đợi đồng bộ khi mất mạng
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  path_provider: ^2.1.3
+
+  # GPS lúc bắt đầu công việc
+  geolocator: ^11.0.0
+
+  # Chụp ảnh bằng chứng
+  image_picker: ^1.1.2
+
+  # Theo dõi có mạng hay không để tự đồng bộ
+  connectivity_plus: ^6.0.3
+
+  # Định dạng ngày giờ tiếng Việt
+  intl: ^0.19.0
+
+  # Sinh id duy nhất cho hàng đợi đồng bộ offline
+  uuid: ^4.4.0
+
+  # Quét mã QR dán trên hộp bẫy để kiểm soát nhân viên đúng vị trí hiện trường.
+  # Dùng zxing (Camera1 API) trên Android thay vì CameraX/MLKit vì các máy đời thấp
+  # (ví dụ Oppo A5i, chip MediaTek cũ, camera2 ở mức LEGACY) thường bị lỗi
+  # "genericError" khi mở camera bằng CameraX.
+  qr_code_scanner_plus: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
